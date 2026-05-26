@@ -35,6 +35,7 @@ target/
 *.ear
 
 # IDE
-.vscode/
+.vscode/*
+!.vscode/settings.json
 .idea/
 
