@@ -4,6 +4,10 @@ updates:
     directory: /web
     schedule:
       interval: weekly
+    ignore:
+      # eslint-config-next targets ESLint 9; ESLint 10 breaks lint until Next ships support
+      - dependency-name: "eslint"
+        update-types: ["version-update:semver-major"]
     groups:
       next:
         patterns:
@@ -18,6 +22,10 @@ updates:
     directory: /backend
     schedule:
       interval: weekly
+    ignore:
+      # Vitest 4 pulls rolldown native bindings; stay on Vitest 3 for portable CI/dev
+      - dependency-name: "vitest"
+        update-types: ["version-update:semver-major"]
     groups:
       nest:
         patterns:
