@@ -21,6 +21,22 @@ npm run dev
 
 Open `http://localhost:3000`.
 
+## Docker (separate startup)
+
+You can start the DB, app, and DB tasks as separate Docker services:
+
+```bash
+# 1) Start only Postgres
+docker compose up -d db
+
+# 2) Run migrations + seed (one-off containers)
+docker compose --profile tools run --rm migrate
+docker compose --profile tools run --rm seed
+
+# 3) Start the app (Next.js)
+docker compose up -d web
+```
+
 ## Database
 
 - **Schema**: `web/prisma/schema.prisma`
@@ -42,4 +58,3 @@ See `legacy/spring-oracle/a9-user-guide.md`.
 ## License
 
 MIT License
-

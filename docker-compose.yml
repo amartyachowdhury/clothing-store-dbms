@@ -1,0 +1,57 @@
+services:
+  db:
+    image: postgres:16-alpine
+    container_name: clothing-store-db
+    restart: unless-stopped
+    ports:
+      - "5433:5432"
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: clothing_store
+    volumes:
+      - clothing_store_data:/var/lib/postgresql/data
+
+  # Next.js (App Router) app — contains both "frontend" and "backend" in Option A.
+  web:
+    build:
+      context: ./web
+      dockerfile: Dockerfile
+    container_name: clothing-store-web
+    depends_on:
+      - db
+    environment:
+      NODE_ENV: development
+      DATABASE_URL: postgresql://postgres:postgres@db:5432/clothing_store?schema=public
+    ports:
+      - "3000:3000"
+
+  # Run DB migrations on demand (one-off container).
+  migrate:
+    build:
+      context: ./web
+      dockerfile: Dockerfile
+    depends_on:
+      - db
+    environment:
+      NODE_ENV: development
+      DATABASE_URL: postgresql://postgres:postgres@db:5432/clothing_store?schema=public
+    command: ["npm", "run", "db:migrate"]
+    profiles: ["tools"]
+
+  # Seed DB on demand (one-off container).
+  seed:
+    build:
+      context: ./web
+      dockerfile: Dockerfile
+    depends_on:
+      - db
+    environment:
+      NODE_ENV: development
+      DATABASE_URL: postgresql://postgres:postgres@db:5432/clothing_store?schema=public
+    command: ["npm", "run", "db:seed"]
+    profiles: ["tools"]
+
+volumes:
+  clothing_store_data:
+
