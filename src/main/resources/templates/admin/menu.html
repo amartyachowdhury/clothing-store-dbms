@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin - Schema Management - CPS510 DBMS</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="/css/style.css" rel="stylesheet">
+</head>
+<body>
+    <nav class="navbar navbar-expand-lg navbar-dark bg-primary">
+        <div class="container-fluid">
+            <a class="navbar-brand" th:href="@{/}">CPS510 DBMS</a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav">
+                    <li class="nav-item">
+                        <a class="nav-link" th:href="@{/}">Home</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" th:href="@{/customers}">Customers</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" th:href="@{/products}">Products</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" th:href="@{/orders}">Orders</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" th:href="@{/payments}">Payments</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link active" th:href="@{/admin}">Admin</a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container mt-4">
+        <h1 class="mb-4">Database Schema Management</h1>
+        
+        <!-- Flash Messages -->
+        <div th:if="${message}" class="alert" 
+             th:classappend="${messageType == 'success' ? 'alert-success' : 'alert-danger'}" 
+             role="alert">
+            <pre th:text="${message}" style="white-space: pre-wrap; margin: 0;"></pre>
+        </div>
+
+        <!-- Query Results -->
+        <div th:if="${queryResult}" class="card mb-4">
+            <div class="card-header">
+                <h5 class="mb-0">Table Summary</h5>
+            </div>
+            <div class="card-body">
+                <pre th:text="${queryResult}" style="white-space: pre-wrap; font-family: monospace;"></pre>
+            </div>
+        </div>
+
+        <!-- Warning Card -->
+        <div class="alert alert-warning mb-4" role="alert">
+            <strong>Warning:</strong> Schema management operations can delete data and modify database structure. 
+            Use with caution!
+        </div>
+
+        <!-- Menu Options -->
+        <div class="row">
+            <!-- Drop Tables -->
+            <div class="col-md-6 mb-4">
+                <div class="card border-danger">
+                    <div class="card-header bg-danger text-white">
+                        <h5 class="mb-0">1. Drop Tables</h5>
+                    </div>
+                    <div class="card-body">
+                        <p class="card-text">Drop all tables, views, and sequences. This will permanently delete all data!</p>
+                        <form th:action="@{/admin/drop-tables}" method="post" 
+                              onsubmit="return confirm('WARNING: This will delete all tables, views, sequences, and data! Are you absolutely sure?');">
+                            <button type="submit" class="btn btn-danger">Drop All Tables</button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Create Tables -->
+            <div class="col-md-6 mb-4">
+                <div class="card border-success">
+                    <div class="card-header bg-success text-white">
+                        <h5 class="mb-0">2. Create Tables</h5>
+                    </div>
+                    <div class="card-body">
+                        <p class="card-text">Create all tables, sequences, triggers, and views. This will recreate the database schema.</p>
+                        <form th:action="@{/admin/create-tables}" method="post">
+                            <button type="submit" class="btn btn-success">Create All Tables</button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Populate Tables -->
+            <div class="col-md-6 mb-4">
+                <div class="card border-info">
+                    <div class="card-header bg-info text-white">
+                        <h5 class="mb-0">3. Populate Tables</h5>
+                    </div>
+                    <div class="card-body">
+                        <p class="card-text">Insert sample data into all tables. This will add sample customers, products, orders, and payments.</p>
+                        <form th:action="@{/admin/populate-tables}" method="post">
+                            <button type="submit" class="btn btn-info">Populate Tables</button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Query Tables -->
+            <div class="col-md-6 mb-4">
+                <div class="card border-primary">
+                    <div class="card-header bg-primary text-white">
+                        <h5 class="mb-0">4. Query Tables</h5>
+                    </div>
+                    <div class="card-body">
+                        <p class="card-text">Display summary information about all tables and views, including row counts.</p>
+                        <a th:href="@{/admin/query-tables}" class="btn btn-primary">Query Tables</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Instructions -->
+        <div class="card mt-4">
+            <div class="card-header">
+                <h5 class="mb-0">Instructions</h5>
+            </div>
+            <div class="card-body">
+                <ol>
+                    <li><strong>Drop Tables:</strong> Removes all tables, views, and sequences. Use this to start fresh.</li>
+                    <li><strong>Create Tables:</strong> Creates the complete database schema (tables, sequences, triggers, views).</li>
+                    <li><strong>Populate Tables:</strong> Inserts sample data into all tables. Make sure tables exist first!</li>
+                    <li><strong>Query Tables:</strong> Shows a summary of row counts for each table and view.</li>
+                </ol>
+                <p class="mb-0"><strong>Typical workflow:</strong> Drop Tables → Create Tables → Populate Tables → Query Tables</p>
+            </div>
+        </div>
+
+        <!-- Back to Home -->
+        <div class="mt-4">
+            <a th:href="@{/}" class="btn btn-secondary">Back to Home</a>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>
+

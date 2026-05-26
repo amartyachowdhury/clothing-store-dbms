@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title th:text="${product.productId != null} ? 'Edit Product' : 'New Product'">Product Form - CPS510 DBMS</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="/css/style.css" rel="stylesheet">
+</head>
+<body>
+    <nav class="navbar navbar-expand-lg navbar-dark bg-primary">
+        <div class="container-fluid">
+            <a class="navbar-brand" th:href="@{/}">CPS510 DBMS</a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav">
+                    <li class="nav-item">
+                        <a class="nav-link" th:href="@{/}">Home</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" th:href="@{/customers}">Customers</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link active" th:href="@{/products}">Products</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" th:href="@{/orders}">Orders</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" th:href="@{/payments}">Payments</a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container mt-4">
+        <h1 th:text="${product.productId != null} ? 'Edit Product' : 'New Product'">Product Form</h1>
+
+        <div th:if="${errorMessage}" class="alert alert-danger alert-dismissible fade show" role="alert">
+            <span th:text="${errorMessage}"></span>
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+
+        <div class="card">
+            <div class="card-body">
+                <form th:action="${product.productId != null} ? @{/products/{id}/edit(id=${product.productId})} : @{/products/new}" 
+                      th:object="${product}" method="post">
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label for="productName" class="form-label">Product Name *</label>
+                            <input type="text" class="form-control" id="productName" th:field="*{productName}" required>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label for="productBrand" class="form-label">Brand *</label>
+                            <input type="text" class="form-control" id="productBrand" th:field="*{productBrand}" required>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-4 mb-3">
+                            <label for="productSize" class="form-label">Size *</label>
+                            <input type="text" class="form-control" id="productSize" th:field="*{productSize}" required>
+                        </div>
+                        <div class="col-md-4 mb-3">
+                            <label for="productColour" class="form-label">Color *</label>
+                            <input type="text" class="form-control" id="productColour" th:field="*{productColour}" required>
+                        </div>
+                        <div class="col-md-4 mb-3">
+                            <label for="categoryId" class="form-label">Category *</label>
+                            <select class="form-select" id="categoryId" th:field="*{categoryId}" required>
+                                <option value="">Select Category</option>
+                                <option th:each="category : ${categories}" 
+                                        th:value="${category.categoryId}" 
+                                        th:text="${category.categoryName}"></option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label for="productPrice" class="form-label">Price *</label>
+                            <input type="number" step="0.01" min="0.01" class="form-control" id="productPrice" th:field="*{productPrice}" required>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label for="productStockQty" class="form-label">Stock Quantity *</label>
+                            <input type="number" min="0" class="form-control" id="productStockQty" th:field="*{productStockQty}" required>
+                        </div>
+                    </div>
+                    <div class="d-flex gap-2">
+                        <button type="submit" class="btn btn-primary">Save</button>
+                        <a th:href="@{/products}" class="btn btn-secondary">Cancel</a>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>
+
