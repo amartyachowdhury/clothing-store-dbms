@@ -32,8 +32,8 @@ cp .env.example .env
 |--------|-------------|
 | `npm install` | Install dependencies |
 | `npm run dev` | `nest start --watch` — development with hot reload |
-| `npm run build` | Compile TypeScript to **`dist/`** |
-| `npm run start` | Run **`dist/main.js`** (production) |
+| `npm run build` | Compile TypeScript to **`dist/`** (gitignored; produced locally or in Docker) |
+| `npm run start` | Run **`dist/main.js`** (production; run **`build`** first) |
 | `npm run db:generate` | `prisma generate` |
 | `npm run db:migrate` | `prisma migrate deploy` |
 | `npm run db:seed` | Run **`prisma/seed.ts`** |

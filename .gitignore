@@ -6,6 +6,9 @@ node_modules/
 out/
 next-env.d.ts
 
+# NestJS build output (compile in CI/Docker, do not commit)
+backend/dist/
+
 # Prisma
 *.db
 

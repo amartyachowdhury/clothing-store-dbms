@@ -11,7 +11,7 @@ This directory is the **Next.js (App Router)** admin UI. It loads and mutates da
 - **UI:** Next.js App Router, React, Tailwind CSS  
 - **Data:** HTTP client in **`src/lib/api.ts`** (`API_URL`, `NEXT_PUBLIC_API_URL`)  
 - **Validation:** Zod (forms / server actions)  
-- **Prisma in `web/prisma/`:** used for **`prisma generate`** during install/build; **`DATABASE_URL`** must be set for those commands. Runtime reads/writes go through the API.
+- **Database:** owned by **`../backend/prisma/`** — this package does not include Prisma or migrations.
 
 ---
 
@@ -19,7 +19,7 @@ This directory is the **Next.js (App Router)** admin UI. It loads and mutates da
 
 - **Node.js 22+**  
 - **NestJS API running** (e.g. `http://localhost:4000`) — start from **`../backend`** or use **root `docker compose up -d backend`**.  
-- **PostgreSQL** reachable at the URL in **`DATABASE_URL`** (for Prisma generate / optional local `db:*` scripts). Easiest: **`docker compose up -d db`** from the **repo root** (port **5433**).
+- **PostgreSQL** running for the API (easiest: **`docker compose up -d db`** from the **repo root**, port **5433**).
 
 Do **not** run two Postgres containers that both bind host port **5433** (e.g. root `db` and `web/docker-compose.yml` at the same time).
 
@@ -42,7 +42,7 @@ _Alternative:_ Postgres only — `docker compose up -d` inside **`web/`** uses *
 cp .env.example .env
 ```
 
-Ensure **`API_URL`** and **`NEXT_PUBLIC_API_URL`** match your API (default `http://localhost:4000`). Set **`DATABASE_URL`** for Prisma (same DB as the API uses).
+Ensure **`API_URL`** and **`NEXT_PUBLIC_API_URL`** match your API (default `http://localhost:4000`).
 
 ### 3. Install and dev server
 
@@ -60,14 +60,12 @@ Open [http://localhost:3000](http://localhost:3000).
 | Command | Description |
 |--------|-------------|
 | `npm run dev` | Next.js dev server |
-| `npm run build` | `prisma generate` + production build |
+| `npm run build` | Production build |
 | `npm run start` | Production server (after `build`) |
 | `npm run lint` | ESLint |
 | `npm run typecheck` | `tsc --noEmit` |
-| `npm run db:push` | Push schema to DB (dev convenience; API migrations are the source of truth in **`backend/prisma/`**) |
-| `npm run db:migrate` | Prisma migrate (dev) |
-| `npm run db:seed` | Seed via Prisma script in **`web/prisma/`** — prefer **`backend`** seed when using Docker **`seed`** service |
-| `npm run db:studio` | Prisma Studio |
+
+Database commands (`db:migrate`, `db:seed`, etc.) are in **`../backend`** — see [`backend/README.md`](../backend/README.md).
 
 ---
 

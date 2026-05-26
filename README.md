@@ -91,8 +91,6 @@ npm run dev
 
 Open **http://localhost:3000**.
 
-> **Note:** `web/.env` still needs **`DATABASE_URL`** so `prisma generate` can run during **`npm install`** / **`npm run build`**, even though pages and server actions use the **HTTP API** at runtime.
-
 ---
 
 ## Environment variables
@@ -106,16 +104,14 @@ Copy the checked-in examples:
 |------|-----------|---------|
 | `web/.env` | `API_URL` | Server-side base URL for the Nest API (e.g. `http://localhost:4000`). |
 | `web/.env` | `NEXT_PUBLIC_API_URL` | Browser-accessible API base URL (same as `API_URL` for local dev). |
-| `web/.env` | `DATABASE_URL` | Prisma CLI / **build-time** client generation only. |
 | `backend/.env` | `DATABASE_URL` | Database URL for migrations, seed, and the running API. |
 | `backend/.env` | `PORT` | API listen port (default `4000`). |
 
 ---
 
-## Database and Prisma layout
+## Database and Prisma
 
-- **Authoritative for migrations, seed, and runtime DB access:** **`backend/prisma/`** (`schema.prisma`, `migrations/`, `seed.ts`). Docker **`migrate`** / **`seed`** services use this tree.  
-- **`web/prisma/`** exists so **`prisma generate`** can run during the Next.js **install/build** pipeline. If you change the schema, keep **`backend/prisma`** and **`web/prisma`** in sync (or consolidate later so only one package owns migrations).
+All schema, migrations, seed, and runtime DB access live under **`backend/prisma/`** only. Docker **`migrate`** / **`seed`** and local `npm run db:*` in **`backend/`** use that tree. The Next.js app does not ship a duplicate Prisma schema.
 
 ---
 
