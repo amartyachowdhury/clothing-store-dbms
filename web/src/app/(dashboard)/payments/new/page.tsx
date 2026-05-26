@@ -2,7 +2,9 @@ import Link from "next/link";
 import { PageHeader } from "@/components/page-header";
 import { Label, Input, Select } from "@/components/ui/input";
 import { buttonVariants } from "@/components/ui/button";
-import { createPayment } from "@/app/actions/orders";
+import { createPaymentFormAction } from "@/app/actions/orders";
+import { ActionForm } from "@/components/action-form";
+import { SubmitButton } from "@/components/submit-button";
 import { apiJson } from "@/lib/api";
 import { cn } from "@/lib/utils";
 
@@ -27,7 +29,7 @@ export default async function NewPaymentPage({
         description="Link a payment to an order. Paid totals update order status automatically."
       />
 
-      <form action={createPayment} className="max-w-xl space-y-4 rounded-xl border border-border bg-card p-6">
+      <ActionForm action={createPaymentFormAction} className="max-w-xl space-y-4 rounded-xl border border-border bg-card p-6">
         <div className="space-y-2">
           <Label htmlFor="orderId">Order</Label>
           <Select
@@ -76,14 +78,12 @@ export default async function NewPaymentPage({
           />
         </div>
         <div className="flex gap-3 pt-2">
-          <button type="submit" className={cn(buttonVariants())}>
-            Save payment
-          </button>
+          <SubmitButton pendingLabel="Saving…">Save payment</SubmitButton>
           <Link href="/payments" className={cn(buttonVariants({ variant: "outline" }))}>
             Cancel
           </Link>
         </div>
-      </form>
+      </ActionForm>
     </>
   );
 }

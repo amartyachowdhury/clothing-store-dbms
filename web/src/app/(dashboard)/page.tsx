@@ -7,11 +7,13 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { PageHeader } from "@/components/page-header";
-import { apiJson } from "@/lib/api";
+import { SystemStatusCard } from "@/components/system-status";
+import { apiJson, fetchHealth } from "@/lib/api";
 import { formatCurrency } from "@/lib/utils";
 
 export default async function DashboardPage() {
-  const [dashboardStats, orders, lowStock, revenue] = await Promise.all([
+  const [health, dashboardStats, orders, lowStock, revenue] = await Promise.all([
+    fetchHealth(),
     apiJson<{
       customerCount: number;
       productCount: number;
@@ -40,6 +42,8 @@ export default async function DashboardPage() {
         title="Dashboard"
         description="Overview of your clothing retail store operations."
       />
+
+      <SystemStatusCard health={health} />
 
       <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
         {stats.map((stat) => (

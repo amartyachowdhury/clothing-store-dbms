@@ -17,15 +17,16 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { Label, Input, Select } from "@/components/ui/input";
-import { buttonVariants } from "@/components/ui/button";
 import {
-  addOrderItem,
-  deleteOrder,
-  removeOrderItem,
+  addOrderItemFormAction,
+  deleteOrderFormAction,
+  removeOrderItemFormAction,
 } from "@/app/actions/orders";
+import { ActionForm } from "@/components/action-form";
+import { SubmitButton } from "@/components/submit-button";
 import { getOrderWithDetails } from "@/lib/services/orders";
 import { apiJson } from "@/lib/api";
-import { cn, formatCurrency, formatDate } from "@/lib/utils";
+import { formatCurrency, formatDate } from "@/lib/utils";
 
 export default async function OrderDetailPage({
   params,
@@ -46,7 +47,7 @@ export default async function OrderDetailPage({
     notFound();
   }
 
-  const addItemAction = addOrderItem.bind(null, orderId);
+  const addItemAction = addOrderItemFormAction.bind(null, orderId);
 
   return (
     <>
@@ -134,14 +135,23 @@ export default async function OrderDetailPage({
                         {formatCurrency(Number(item.unitPrice) * item.quantity)}
                       </TableCell>
                       <TableCell className="text-right">
-                        <form action={removeOrderItem.bind(null, orderId, item.productId)}>
-                          <button
-                            type="submit"
-                            className="text-sm text-destructive hover:underline"
+                        <ActionForm
+                          action={removeOrderItemFormAction.bind(
+                            null,
+                            orderId,
+                            item.productId,
+                          )}
+                          className="inline"
+                        >
+                          <SubmitButton
+                            variant="ghost"
+                            size="sm"
+                            pendingLabel="Removing…"
+                            className="h-auto px-0 text-destructive hover:bg-transparent hover:text-destructive"
                           >
                             Remove
-                          </button>
-                        </form>
+                          </SubmitButton>
+                        </ActionForm>
                       </TableCell>
                     </TableRow>
                   ))
@@ -156,7 +166,7 @@ export default async function OrderDetailPage({
             <CardTitle>Add line item</CardTitle>
           </CardHeader>
           <CardContent>
-            <form action={addItemAction} className="space-y-4">
+            <ActionForm action={addItemAction} className="space-y-4">
               <div className="space-y-2">
                 <Label htmlFor="productId">Product</Label>
                 <Select id="productId" name="productId" required defaultValue="">
@@ -185,10 +195,10 @@ export default async function OrderDetailPage({
                   required
                 />
               </div>
-              <button type="submit" className={cn(buttonVariants(), "w-full")}>
+              <SubmitButton pendingLabel="Adding…" className="w-full">
                 Add item
-              </button>
-            </form>
+              </SubmitButton>
+            </ActionForm>
           </CardContent>
         </Card>
       </div>
@@ -213,11 +223,11 @@ export default async function OrderDetailPage({
         </CardContent>
       </Card>
 
-      <form action={deleteOrder.bind(null, orderId)} className="mt-8">
-        <button type="submit" className={cn(buttonVariants({ variant: "destructive" }))}>
+      <ActionForm action={deleteOrderFormAction.bind(null, orderId)} className="mt-8">
+        <SubmitButton variant="destructive" pendingLabel="Deleting…">
           Delete order
-        </button>
-      </form>
+        </SubmitButton>
+      </ActionForm>
     </>
   );
 }

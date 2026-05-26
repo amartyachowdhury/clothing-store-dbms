@@ -1,6 +1,7 @@
 "use server";
 
 import { apiJson } from "@/lib/api";
+import { type FormState, runFormAction } from "@/lib/form-action";
 import { orderItemSchema, orderSchema, paymentSchema } from "@/lib/validations";
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
@@ -138,4 +139,59 @@ export async function deletePayment(id: number) {
   // Can't easily revalidate the order without the orderId; revalidate orders list instead
   revalidatePath(`/orders`);
   redirect("/payments");
+}
+
+export async function createOrderFormAction(
+  _prev: FormState,
+  formData: FormData,
+) {
+  return runFormAction(() => createOrder(formData));
+}
+
+export async function deleteOrderFormAction(
+  id: number,
+  _prev: FormState,
+  _formData: FormData,
+) {
+  return runFormAction(() => deleteOrder(id));
+}
+
+export async function addOrderItemFormAction(
+  orderId: number,
+  _prev: FormState,
+  formData: FormData,
+) {
+  return runFormAction(() => addOrderItem(orderId, formData));
+}
+
+export async function removeOrderItemFormAction(
+  orderId: number,
+  productId: number,
+  _prev: FormState,
+  _formData: FormData,
+) {
+  return runFormAction(() => removeOrderItem(orderId, productId));
+}
+
+export async function createPaymentFormAction(
+  _prev: FormState,
+  formData: FormData,
+) {
+  return runFormAction(() => createPayment(formData));
+}
+
+export async function updatePaymentFormAction(
+  id: number,
+  _prev: FormState,
+  formData: FormData,
+) {
+  return runFormAction(() => updatePayment(id, formData));
+}
+
+export async function deletePaymentFormAction(
+  id: number,
+  _prev: FormState,
+  _formData: FormData,
+) {
+  return runFormAction(() => deletePayment(id));
 }

@@ -1,6 +1,7 @@
 "use server";
 
 import { apiJson } from "@/lib/api";
+import { type FormState, runFormAction } from "@/lib/form-action";
 import { customerSchema } from "@/lib/validations";
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
@@ -72,4 +73,27 @@ export async function deleteCustomer(id: number) {
   }
   revalidatePath("/customers");
   redirect("/customers");
+}
+
+export async function createCustomerFormAction(
+  _prev: FormState,
+  formData: FormData,
+) {
+  return runFormAction(() => createCustomer(formData));
+}
+
+export async function updateCustomerFormAction(
+  id: number,
+  _prev: FormState,
+  formData: FormData,
+) {
+  return runFormAction(() => updateCustomer(id, formData));
+}
+
+export async function deleteCustomerFormAction(
+  id: number,
+  _prev: FormState,
+  _formData: FormData,
+) {
+  return runFormAction(() => deleteCustomer(id));
 }

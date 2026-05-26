@@ -10,6 +10,7 @@ import {
   ShoppingCart,
   Users,
 } from "lucide-react";
+import { SystemStatusPoller } from "@/components/system-status-poller";
 import { cn } from "@/lib/utils";
 
 const navItems = [
@@ -25,7 +26,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
 
   return (
     <div className="min-h-screen lg:grid lg:grid-cols-[260px_1fr]">
-      <aside className="border-b border-border bg-card lg:border-b-0 lg:border-r">
+      <aside className="flex flex-col border-b border-border bg-card lg:min-h-screen lg:border-b-0 lg:border-r">
         <div className="flex h-16 items-center gap-2 border-b border-border px-6">
           <Shirt className="h-6 w-6" />
           <div>
@@ -57,6 +58,9 @@ export function AppShell({ children }: { children: React.ReactNode }) {
             );
           })}
         </nav>
+        <div className="mt-auto hidden lg:block">
+          <SystemStatusPoller />
+        </div>
       </aside>
       <main className="min-w-0">
         <div className="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">

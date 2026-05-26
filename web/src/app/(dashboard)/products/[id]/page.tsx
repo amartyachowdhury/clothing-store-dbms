@@ -6,10 +6,11 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { buttonVariants } from "@/components/ui/button";
-import { deleteProduct } from "@/app/actions/products";
+import { deleteProductFormAction } from "@/app/actions/products";
+import { ActionForm } from "@/components/action-form";
+import { SubmitButton } from "@/components/submit-button";
 import { apiJson } from "@/lib/api";
-import { cn, formatCurrency } from "@/lib/utils";
+import { formatCurrency } from "@/lib/utils";
 
 export default async function ProductDetailPage({
   params,
@@ -65,11 +66,14 @@ export default async function ProductDetailPage({
         </CardContent>
       </Card>
 
-      <form action={deleteProduct.bind(null, product.id)} className="mt-8">
-        <button type="submit" className={cn(buttonVariants({ variant: "destructive" }))}>
+      <ActionForm
+        action={deleteProductFormAction.bind(null, product.id)}
+        className="mt-8"
+      >
+        <SubmitButton variant="destructive" pendingLabel="Deleting…">
           Delete product
-        </button>
-      </form>
+        </SubmitButton>
+      </ActionForm>
     </>
   );
 }

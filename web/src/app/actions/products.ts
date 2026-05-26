@@ -1,6 +1,7 @@
 "use server";
 
 import { apiJson } from "@/lib/api";
+import { type FormState, runFormAction } from "@/lib/form-action";
 import { productSchema } from "@/lib/validations";
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
@@ -71,4 +72,27 @@ export async function deleteProduct(id: number) {
   }
   revalidatePath("/products");
   redirect("/products");
+}
+
+export async function createProductFormAction(
+  _prev: FormState,
+  formData: FormData,
+) {
+  return runFormAction(() => createProduct(formData));
+}
+
+export async function updateProductFormAction(
+  id: number,
+  _prev: FormState,
+  formData: FormData,
+) {
+  return runFormAction(() => updateProduct(id, formData));
+}
+
+export async function deleteProductFormAction(
+  id: number,
+  _prev: FormState,
+  _formData: FormData,
+) {
+  return runFormAction(() => deleteProduct(id));
 }

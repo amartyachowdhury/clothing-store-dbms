@@ -8,10 +8,11 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { buttonVariants } from "@/components/ui/button";
-import { deletePayment } from "@/app/actions/orders";
+import { deletePaymentFormAction } from "@/app/actions/orders";
+import { ActionForm } from "@/components/action-form";
+import { SubmitButton } from "@/components/submit-button";
 import { apiJson } from "@/lib/api";
-import { cn, formatCurrency } from "@/lib/utils";
+import { formatCurrency } from "@/lib/utils";
 
 export default async function PaymentDetailPage({
   params,
@@ -68,11 +69,14 @@ export default async function PaymentDetailPage({
         </CardContent>
       </Card>
 
-      <form action={deletePayment.bind(null, payment.id)} className="mt-8">
-        <button type="submit" className={cn(buttonVariants({ variant: "destructive" }))}>
+      <ActionForm
+        action={deletePaymentFormAction.bind(null, payment.id)}
+        className="mt-8"
+      >
+        <SubmitButton variant="destructive" pendingLabel="Deleting…">
           Delete payment
-        </button>
-      </form>
+        </SubmitButton>
+      </ActionForm>
     </>
   );
 }

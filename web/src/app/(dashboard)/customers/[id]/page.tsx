@@ -7,10 +7,11 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { buttonVariants } from "@/components/ui/button";
-import { deleteCustomer } from "@/app/actions/customers";
+import { deleteCustomerFormAction } from "@/app/actions/customers";
+import { ActionForm } from "@/components/action-form";
+import { SubmitButton } from "@/components/submit-button";
 import { apiJson } from "@/lib/api";
-import { cn, formatCurrency, formatDate } from "@/lib/utils";
+import { formatCurrency, formatDate } from "@/lib/utils";
 
 export default async function CustomerDetailPage({
   params,
@@ -82,11 +83,14 @@ export default async function CustomerDetailPage({
         </Card>
       </div>
 
-      <form action={deleteCustomer.bind(null, customer.id)} className="mt-8">
-        <button type="submit" className={cn(buttonVariants({ variant: "destructive" }))}>
+      <ActionForm
+        action={deleteCustomerFormAction.bind(null, customer.id)}
+        className="mt-8"
+      >
+        <SubmitButton variant="destructive" pendingLabel="Deleting…">
           Delete customer
-        </button>
-      </form>
+        </SubmitButton>
+      </ActionForm>
     </>
   );
 }

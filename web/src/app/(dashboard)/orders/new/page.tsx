@@ -2,7 +2,9 @@ import Link from "next/link";
 import { PageHeader } from "@/components/page-header";
 import { Label, Input, Select } from "@/components/ui/input";
 import { buttonVariants } from "@/components/ui/button";
-import { createOrder } from "@/app/actions/orders";
+import { createOrderFormAction } from "@/app/actions/orders";
+import { ActionForm } from "@/components/action-form";
+import { SubmitButton } from "@/components/submit-button";
 import { apiJson } from "@/lib/api";
 import { cn } from "@/lib/utils";
 
@@ -19,7 +21,7 @@ export default async function NewOrderPage() {
         description="Start a new order, then add line items on the detail page."
       />
 
-      <form action={createOrder} className="max-w-xl space-y-4 rounded-xl border border-border bg-card p-6">
+      <ActionForm action={createOrderFormAction} className="max-w-xl space-y-4 rounded-xl border border-border bg-card p-6">
         <div className="space-y-2">
           <Label htmlFor="customerId">Customer</Label>
           <Select id="customerId" name="customerId" required defaultValue="">
@@ -56,14 +58,12 @@ export default async function NewOrderPage() {
           />
         </div>
         <div className="flex gap-3 pt-2">
-          <button type="submit" className={cn(buttonVariants())}>
-            Create order
-          </button>
+          <SubmitButton pendingLabel="Creating…">Create order</SubmitButton>
           <Link href="/orders" className={cn(buttonVariants({ variant: "outline" }))}>
             Cancel
           </Link>
         </div>
-      </form>
+      </ActionForm>
     </>
   );
 }

@@ -3,7 +3,9 @@ import { notFound } from "next/navigation";
 import { PageHeader } from "@/components/page-header";
 import { Label, Input, Select } from "@/components/ui/input";
 import { buttonVariants } from "@/components/ui/button";
-import { updateProduct } from "@/app/actions/products";
+import { updateProductFormAction } from "@/app/actions/products";
+import { ActionForm } from "@/components/action-form";
+import { SubmitButton } from "@/components/submit-button";
 import { apiJson } from "@/lib/api";
 import { cn } from "@/lib/utils";
 
@@ -34,13 +36,13 @@ export default async function EditProductPage({
     notFound();
   }
 
-  const updateAction = updateProduct.bind(null, product.id);
+  const updateAction = updateProductFormAction.bind(null, product.id);
 
   return (
     <>
       <PageHeader title="Edit product" description={`Update ${product.name}.`} />
 
-      <form action={updateAction} className="max-w-xl space-y-4 rounded-xl border border-border bg-card p-6">
+      <ActionForm action={updateAction} className="max-w-xl space-y-4 rounded-xl border border-border bg-card p-6">
         <div className="space-y-2">
           <Label htmlFor="name">Name</Label>
           <Input id="name" name="name" defaultValue={product.name} required />
@@ -102,9 +104,7 @@ export default async function EditProductPage({
           </div>
         </div>
         <div className="flex gap-3 pt-2">
-          <button type="submit" className={cn(buttonVariants())}>
-            Save changes
-          </button>
+          <SubmitButton pendingLabel="Saving…">Save changes</SubmitButton>
           <Link
             href={`/products/${product.id}`}
             className={cn(buttonVariants({ variant: "outline" }))}
@@ -112,7 +112,7 @@ export default async function EditProductPage({
             Cancel
           </Link>
         </div>
-      </form>
+      </ActionForm>
     </>
   );
 }

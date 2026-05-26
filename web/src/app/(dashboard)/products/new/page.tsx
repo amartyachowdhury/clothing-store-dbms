@@ -2,7 +2,9 @@ import Link from "next/link";
 import { PageHeader } from "@/components/page-header";
 import { Label, Input, Select } from "@/components/ui/input";
 import { buttonVariants } from "@/components/ui/button";
-import { createProduct } from "@/app/actions/products";
+import { createProductFormAction } from "@/app/actions/products";
+import { ActionForm } from "@/components/action-form";
+import { SubmitButton } from "@/components/submit-button";
 import { apiJson } from "@/lib/api";
 import { cn } from "@/lib/utils";
 
@@ -18,7 +20,7 @@ export default async function NewProductPage() {
         description="Add an item to the clothing catalog."
       />
 
-      <form action={createProduct} className="max-w-xl space-y-4 rounded-xl border border-border bg-card p-6">
+      <ActionForm action={createProductFormAction} className="max-w-xl space-y-4 rounded-xl border border-border bg-card p-6">
         <div className="space-y-2">
           <Label htmlFor="name">Name</Label>
           <Input id="name" name="name" required />
@@ -63,14 +65,12 @@ export default async function NewProductPage() {
           </div>
         </div>
         <div className="flex gap-3 pt-2">
-          <button type="submit" className={cn(buttonVariants())}>
-            Create product
-          </button>
+          <SubmitButton pendingLabel="Creating…">Create product</SubmitButton>
           <Link href="/products" className={cn(buttonVariants({ variant: "outline" }))}>
             Cancel
           </Link>
         </div>
-      </form>
+      </ActionForm>
     </>
   );
 }

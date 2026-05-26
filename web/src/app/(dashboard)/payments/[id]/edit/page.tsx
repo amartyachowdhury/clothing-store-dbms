@@ -3,7 +3,9 @@ import { notFound } from "next/navigation";
 import { PageHeader } from "@/components/page-header";
 import { Label, Input, Select } from "@/components/ui/input";
 import { buttonVariants } from "@/components/ui/button";
-import { updatePayment } from "@/app/actions/orders";
+import { updatePaymentFormAction } from "@/app/actions/orders";
+import { ActionForm } from "@/components/action-form";
+import { SubmitButton } from "@/components/submit-button";
 import { apiJson } from "@/lib/api";
 import { cn } from "@/lib/utils";
 
@@ -31,13 +33,13 @@ export default async function EditPaymentPage({
     notFound();
   }
 
-  const updateAction = updatePayment.bind(null, payment.id);
+  const updateAction = updatePaymentFormAction.bind(null, payment.id);
 
   return (
     <>
       <PageHeader title="Edit payment" description={`Update payment #${payment.id}.`} />
 
-      <form action={updateAction} className="max-w-xl space-y-4 rounded-xl border border-border bg-card p-6">
+      <ActionForm action={updateAction} className="max-w-xl space-y-4 rounded-xl border border-border bg-card p-6">
         <div className="space-y-2">
           <Label htmlFor="orderId">Order</Label>
           <Select
@@ -83,9 +85,7 @@ export default async function EditPaymentPage({
           />
         </div>
         <div className="flex gap-3 pt-2">
-          <button type="submit" className={cn(buttonVariants())}>
-            Save changes
-          </button>
+          <SubmitButton pendingLabel="Saving…">Save changes</SubmitButton>
           <Link
             href={`/payments/${payment.id}`}
             className={cn(buttonVariants({ variant: "outline" }))}
@@ -93,7 +93,7 @@ export default async function EditPaymentPage({
             Cancel
           </Link>
         </div>
-      </form>
+      </ActionForm>
     </>
   );
 }
