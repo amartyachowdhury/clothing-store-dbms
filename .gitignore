@@ -2,6 +2,9 @@
 
 # Node / Next.js
 node_modules/
+# Root orchestration (no root lockfile; web/ and backend/ own deps)
+/package-lock.json
+
 .next/
 out/
 next-env.d.ts

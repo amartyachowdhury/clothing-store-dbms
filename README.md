@@ -20,8 +20,10 @@ Browser ──► Next.js (:3000) ──HTTP──► NestJS API (:4000) ──P
 
 ## Prerequisites
 
-- **Node.js 22+** (matches `web/package.json` `engines` and GitHub Actions).  
-- **Docker** (recommended for Postgres and the full three-service setup).
+- **Node.js 22+** — use **`.nvmrc`** (`nvm use`) or **`.node-version`**. `engine-strict` is enabled via `.npmrc`.  
+- **Docker** (recommended for Postgres, the full three-service setup, and lockfile verify/sync scripts).
+
+See **[`docs/DEPENDENCIES.md`](docs/DEPENDENCIES.md)** for lockfile rules and `npm run verify:lockfiles`.
 
 ---
 
@@ -152,10 +154,12 @@ All schema, migrations, seed, and runtime DB access live under **`backend/prisma
 
 | Job | Steps |
 |-----|--------|
-| **Web** | `npm ci` → lint → typecheck → build |
-| **Backend** | `npm ci` → Prisma validate → lint → typecheck → test → build |
+| **Lockfiles** | `npm ci` in `web/` and `backend/` on Node 22 (from `.nvmrc`) |
+| **Web** | lint → typecheck → build |
+| **Backend** | Prisma validate → lint → typecheck → test → build |
 
-Local backend checks: `cd backend && npm run validate && npm run lint && npm run typecheck && npm run test && npm run build`
+From repo root: `npm run ci:web` or `npm run ci:backend` (requires Node 22+).  
+Before pushing dependency changes: `npm run verify:lockfiles` (Docker).
 
 ---
 
