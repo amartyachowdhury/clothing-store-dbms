@@ -130,7 +130,14 @@ All schema, migrations, seed, and runtime DB access live under **`backend/prisma
 
 ## CI
 
-[`.github/workflows/ci.yml`](.github/workflows/ci.yml) runs **install → lint → typecheck → build** for **`web/`** on **Node 22**. Add a similar job for **`backend/`** when you want API builds enforced in CI.
+[`.github/workflows/ci.yml`](.github/workflows/ci.yml) on **Node 22**:
+
+| Job | Steps |
+|-----|--------|
+| **Web** | `npm ci` → lint → typecheck → build |
+| **Backend** | `npm ci` → Prisma validate → lint → typecheck → test → build |
+
+Local backend checks: `cd backend && npm run validate && npm run lint && npm run typecheck && npm run test && npm run build`
 
 ---
 

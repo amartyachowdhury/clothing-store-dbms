@@ -7,6 +7,7 @@ import {
   Post,
   Query,
 } from "@nestjs/common";
+import { OrderStatus } from "@prisma/client";
 import { PrismaService } from "../prisma/prisma.service";
 import { orderCreateSchema, orderItemSchema, paymentSchema } from "../validation";
 import { OrdersService } from "./orders.service";
@@ -21,12 +22,17 @@ export class OrdersController {
   @Get()
   async list(@Query("q") q?: string) {
     const query = q?.trim();
+    const statusMatch =
+      query &&
+      (Object.values(OrderStatus) as string[]).includes(query.toUpperCase())
+        ? (query.toUpperCase() as OrderStatus)
+        : undefined;
+
     return this.prisma.order.findMany({
       where: query
         ? {
             OR: [
-              // status query
-              { status: { equals: query.toUpperCase() as any } },
+              ...(statusMatch ? [{ status: { equals: statusMatch } }] : []),
               { customer: { name: { contains: query, mode: "insensitive" } } },
               { employee: { name: { contains: query, mode: "insensitive" } } },
             ],
@@ -133,7 +139,11 @@ export class OrdersController {
   @Post(":id/payments")
   async createPayment(@Param("id") id: string, @Body() body: unknown) {
     const orderId = Number(id);
-    const parsed = paymentSchema.safeParse({ ...(body as any), orderId });
+    const bodyRecord =
+      typeof body === "object" && body !== null
+        ? (body as Record<string, unknown>)
+        : {};
+    const parsed = paymentSchema.safeParse({ ...bodyRecord, orderId });
     if (!parsed.success) {
       return { error: parsed.error.issues[0]?.message ?? "Invalid payment" };
     }

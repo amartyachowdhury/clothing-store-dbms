@@ -7,6 +7,8 @@ on:
 
 env:
   FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
+  # Prisma validate/generate only; no DB required in CI
+  DATABASE_URL: postgresql://postgres:postgres@localhost:5432/clothing_store?schema=public
 
 jobs:
   web:
@@ -36,3 +38,35 @@ jobs:
       - name: Build
         run: npm run build
 
+  backend:
+    name: Backend (validate, lint, typecheck, test, build)
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: backend
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: backend/package-lock.json
+
+      - name: Install
+        run: npm ci
+
+      - name: Prisma validate
+        run: npm run validate
+
+      - name: Lint
+        run: npm run lint
+
+      - name: Typecheck
+        run: npm run typecheck
+
+      - name: Test
+        run: npm run test
+
+      - name: Build
+        run: npm run build

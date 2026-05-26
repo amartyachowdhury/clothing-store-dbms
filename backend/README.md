@@ -30,10 +30,14 @@ cp .env.example .env
 
 | Command | Description |
 |--------|-------------|
-| `npm install` | Install dependencies |
+| `npm install` | Install dependencies (runs **`postinstall`** → `prisma generate`) |
 | `npm run dev` | `nest start --watch` — development with hot reload |
 | `npm run build` | Compile TypeScript to **`dist/`** (gitignored; produced locally or in Docker) |
 | `npm run start` | Run **`dist/main.js`** (production; run **`build`** first) |
+| `npm run lint` | ESLint on **`src/**/*.ts`** |
+| `npm run typecheck` | `tsc --noEmit` |
+| `npm run test` | Vitest unit tests (`*.spec.ts`) |
+| `npm run validate` | `prisma validate` |
 | `npm run db:generate` | `prisma generate` |
 | `npm run db:migrate` | `prisma migrate deploy` |
 | `npm run db:seed` | Run **`prisma/seed.ts`** |

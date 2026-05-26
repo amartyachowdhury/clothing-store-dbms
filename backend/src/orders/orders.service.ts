@@ -1,6 +1,7 @@
 import { Injectable } from "@nestjs/common";
-import { OrderStatus, PaymentStatus, Prisma } from "@prisma/client";
+import { Prisma } from "@prisma/client";
 import { PrismaService } from "../prisma/prisma.service";
+import { calculateItemsTotal, deriveOrderStatus } from "./orders.logic";
 
 type DbClient = Prisma.TransactionClient;
 
@@ -10,10 +11,7 @@ export class OrdersService {
 
   async recalculateOrderTotal(orderId: number, db: DbClient) {
     const items = await db.orderItem.findMany({ where: { orderId } });
-    const total = items.reduce(
-      (sum, item) => sum + Number(item.unitPrice) * item.quantity,
-      0,
-    );
+    const total = calculateItemsTotal(items);
     await db.order.update({
       where: { id: orderId },
       data: { totalAmount: total > 0 ? total : 0 },
@@ -29,23 +27,10 @@ export class OrdersService {
 
     if (!order) return;
 
-    if (payments.length === 0) {
-      await db.order.update({
-        where: { id: orderId },
-        data: { status: OrderStatus.PENDING },
-      });
-      return;
-    }
-
-    const paidTotal = payments
-      .filter((p) => p.status === PaymentStatus.PAID)
-      .reduce((sum, p) => sum + Number(p.amount), 0);
-
-    const orderTotal = Number(order.totalAmount);
-    const nextStatus =
-      orderTotal > 0 && paidTotal >= orderTotal
-        ? OrderStatus.COMPLETED
-        : OrderStatus.PENDING;
+    const nextStatus = deriveOrderStatus(
+      Number(order.totalAmount),
+      payments,
+    );
 
     await db.order.update({ where: { id: orderId }, data: { status: nextStatus } });
   }
