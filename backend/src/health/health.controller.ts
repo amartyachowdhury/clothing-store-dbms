@@ -13,9 +13,17 @@ export class HealthController {
   async getHealth() {
     try {
       await this.prisma.$queryRaw`SELECT 1`;
-      return { status: "ok", database: "connected" as const };
+      return {
+        status: "ok",
+        database: "connected" as const,
+        uptimeSeconds: Math.floor(process.uptime()),
+      };
     } catch {
-      return { status: "error", database: "disconnected" as const };
+      return {
+        status: "error",
+        database: "disconnected" as const,
+        uptimeSeconds: Math.floor(process.uptime()),
+      };
     }
   }
 }

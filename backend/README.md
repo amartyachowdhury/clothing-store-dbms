@@ -29,6 +29,13 @@ cp .env.example .env
 
 See **[`../docs/SECURITY.md`](../docs/SECURITY.md)** for production guidance.
 
+### Observability
+
+- **`X-Request-Id`** on every response (correlate with Next.js → API calls).
+- Structured HTTP logs (`LOG_FORMAT=json` in production).
+- **`GET /metrics`** — in-process request/latency counters.
+- See **[`../docs/OBSERVABILITY.md`](../docs/OBSERVABILITY.md)**.
+
 ---
 
 ## Scripts

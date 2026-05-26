@@ -1,3 +1,5 @@
+import { randomUUID } from "node:crypto";
+
 function getApiBaseUrl() {
   return (
     process.env.API_URL ||
@@ -14,6 +16,7 @@ function getDefaultHeaders(): HeadersInit {
   if (apiKey) {
     headers["x-api-key"] = apiKey;
   }
+  headers["x-request-id"] = randomUUID();
   return headers;
 }
 

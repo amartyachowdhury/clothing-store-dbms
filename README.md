@@ -117,7 +117,11 @@ Copy the checked-in examples:
 
 ## Security and operations
 
-The API enables **CORS**, **rate limiting**, and optional **API-key** auth. Request logging is enabled on the backend. See **[`docs/SECURITY.md`](docs/SECURITY.md)** for production checklist and behavior.
+The API enables **CORS**, **rate limiting**, and optional **API-key** auth. See **[`docs/SECURITY.md`](docs/SECURITY.md)** for production checklist and behavior.
+
+## Observability
+
+Structured HTTP logs with **`X-Request-Id`**, plus **`GET /metrics`** and **`GET /health`** on the backend. Details: **[`docs/OBSERVABILITY.md`](docs/OBSERVABILITY.md)**.
 
 **Do not** use default passwords or leave `API_KEY` unset on any host reachable from the internet.
 
