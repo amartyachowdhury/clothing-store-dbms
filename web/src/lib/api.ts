@@ -6,6 +6,17 @@ function getApiBaseUrl() {
   );
 }
 
+function getDefaultHeaders(): HeadersInit {
+  const headers: Record<string, string> = {
+    "content-type": "application/json",
+  };
+  const apiKey = process.env.API_KEY?.trim();
+  if (apiKey) {
+    headers["x-api-key"] = apiKey;
+  }
+  return headers;
+}
+
 export async function apiJson<T>(
   path: string,
   init?: RequestInit,
@@ -16,7 +27,7 @@ export async function apiJson<T>(
   const res = await fetch(url, {
     ...init,
     headers: {
-      "content-type": "application/json",
+      ...getDefaultHeaders(),
       ...(init?.headers ?? {}),
     },
     cache: "no-store",

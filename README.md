@@ -104,8 +104,22 @@ Copy the checked-in examples:
 |------|-----------|---------|
 | `web/.env` | `API_URL` | Server-side base URL for the Nest API (e.g. `http://localhost:4000`). |
 | `web/.env` | `NEXT_PUBLIC_API_URL` | Browser-accessible API base URL (same as `API_URL` for local dev). |
+| `web/.env` | `API_KEY` | Server-only; sent as `X-API-Key` when the API has auth enabled. |
 | `backend/.env` | `DATABASE_URL` | Database URL for migrations, seed, and the running API. |
 | `backend/.env` | `PORT` | API listen port (default `4000`). |
+| `backend/.env` | `API_KEY` | Optional; when set, protects all routes except `/health`. |
+| `backend/.env` | `CORS_ORIGINS` | Comma-separated allowed frontend origins. |
+| `backend/.env` | `THROTTLE_*` | Rate-limit window and max requests per client. |
+
+**Docker Compose** can load overrides from a repo-root **`.env`** (see **`.env.example`**). Defaults (`postgres` / `postgres`, no API key) are for local use only.
+
+---
+
+## Security and operations
+
+The API enables **CORS**, **rate limiting**, and optional **API-key** auth. Request logging is enabled on the backend. See **[`docs/SECURITY.md`](docs/SECURITY.md)** for production checklist and behavior.
+
+**Do not** use default passwords or leave `API_KEY` unset on any host reachable from the internet.
 
 ---
 

@@ -1,14 +1,17 @@
+# Local development only. Change POSTGRES_PASSWORD and API_KEY before any public deployment.
+# Copy .env.example to .env to override defaults.
+
 services:
   db:
     image: postgres:16-alpine
     container_name: clothing-store-db
     restart: unless-stopped
     ports:
-      - "5433:5432"
+      - "${POSTGRES_PORT:-5433}:5432"
     environment:
-      POSTGRES_USER: postgres
-      POSTGRES_PASSWORD: postgres
-      POSTGRES_DB: clothing_store
+      POSTGRES_USER: ${POSTGRES_USER:-postgres}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-postgres}
+      POSTGRES_DB: ${POSTGRES_DB:-clothing_store}
     volumes:
       - clothing_store_data:/var/lib/postgresql/data
 
@@ -21,10 +24,14 @@ services:
       - db
     environment:
       NODE_ENV: development
-      DATABASE_URL: postgresql://postgres:postgres@db:5432/clothing_store?schema=public
-      PORT: 4000
+      DATABASE_URL: postgresql://${POSTGRES_USER:-postgres}:${POSTGRES_PASSWORD:-postgres}@db:5432/${POSTGRES_DB:-clothing_store}?schema=public
+      PORT: ${BACKEND_PORT:-4000}
+      API_KEY: ${API_KEY:-}
+      CORS_ORIGINS: ${CORS_ORIGINS:-http://localhost:3000}
+      THROTTLE_TTL_MS: ${THROTTLE_TTL_MS:-60000}
+      THROTTLE_LIMIT: ${THROTTLE_LIMIT:-100}
     ports:
-      - "4000:4000"
+      - "${BACKEND_PORT:-4000}:4000"
 
   web:
     build:
@@ -36,9 +43,10 @@ services:
     environment:
       NODE_ENV: development
       API_URL: http://backend:4000
-      NEXT_PUBLIC_API_URL: http://backend:4000
+      NEXT_PUBLIC_API_URL: http://localhost:${BACKEND_PORT:-4000}
+      API_KEY: ${API_KEY:-}
     ports:
-      - "3000:3000"
+      - "${WEB_PORT:-3000}:3000"
 
   migrate:
     build:
@@ -47,7 +55,7 @@ services:
     depends_on:
       - db
     environment:
-      DATABASE_URL: postgresql://postgres:postgres@db:5432/clothing_store?schema=public
+      DATABASE_URL: postgresql://${POSTGRES_USER:-postgres}:${POSTGRES_PASSWORD:-postgres}@db:5432/${POSTGRES_DB:-clothing_store}?schema=public
     command: ["npm", "run", "db:migrate"]
     profiles: ["tools"]
 
@@ -58,10 +66,9 @@ services:
     depends_on:
       - db
     environment:
-      DATABASE_URL: postgresql://postgres:postgres@db:5432/clothing_store?schema=public
+      DATABASE_URL: postgresql://${POSTGRES_USER:-postgres}:${POSTGRES_PASSWORD:-postgres}@db:5432/${POSTGRES_DB:-clothing_store}?schema=public
     command: ["npm", "run", "db:seed"]
     profiles: ["tools"]
 
 volumes:
   clothing_store_data:
-

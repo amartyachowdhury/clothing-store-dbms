@@ -23,6 +23,11 @@ cp .env.example .env
 |----------|-------------|
 | `DATABASE_URL` | PostgreSQL connection string (must match the DB used by migrations and seed). |
 | `PORT` | HTTP port (default **4000**). |
+| `API_KEY` | Optional shared secret; clients send `X-API-Key` (or `Authorization: Bearer`). Unset = no auth (local dev). |
+| `CORS_ORIGINS` | Comma-separated origins (default `http://localhost:3000`). |
+| `THROTTLE_TTL_MS` / `THROTTLE_LIMIT` | Rate limit window (ms) and max requests per IP. |
+
+See **[`../docs/SECURITY.md`](../docs/SECURITY.md)** for production guidance.
 
 ---
 

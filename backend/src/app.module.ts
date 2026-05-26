@@ -1,5 +1,7 @@
 import { Module } from "@nestjs/common";
 import { ConfigModule } from "@nestjs/config";
+import { APP_GUARD, APP_INTERCEPTOR } from "@nestjs/core";
+import { ThrottlerGuard, ThrottlerModule } from "@nestjs/throttler";
 import { PrismaModule } from "./prisma/prisma.module";
 import { HealthController } from "./health/health.controller";
 import { CustomersController } from "./customers/customers.controller";
@@ -9,9 +11,20 @@ import { OrdersService } from "./orders/orders.service";
 import { PaymentsController } from "./payments/payments.controller";
 import { DashboardController } from "./dashboard/dashboard.controller";
 import { MetaController } from "./meta/meta.controller";
+import { ApiKeyGuard } from "./security/api-key.guard";
+import { LoggingInterceptor } from "./security/logging.interceptor";
+
+const throttleTtl = Number(process.env.THROTTLE_TTL_MS ?? 60_000);
+const throttleLimit = Number(process.env.THROTTLE_LIMIT ?? 100);
 
 @Module({
-  imports: [ConfigModule.forRoot({ isGlobal: true }), PrismaModule],
+  imports: [
+    ConfigModule.forRoot({ isGlobal: true }),
+    ThrottlerModule.forRoot({
+      throttlers: [{ ttl: throttleTtl, limit: throttleLimit }],
+    }),
+    PrismaModule,
+  ],
   controllers: [
     HealthController,
     CustomersController,
@@ -21,7 +34,11 @@ import { MetaController } from "./meta/meta.controller";
     DashboardController,
     MetaController,
   ],
-  providers: [OrdersService],
+  providers: [
+    OrdersService,
+    { provide: APP_GUARD, useClass: ThrottlerGuard },
+    { provide: APP_GUARD, useClass: ApiKeyGuard },
+    { provide: APP_INTERCEPTOR, useClass: LoggingInterceptor },
+  ],
 })
 export class AppModule {}
-
