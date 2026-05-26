@@ -9,7 +9,7 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { prisma } from "@/lib/prisma";
+import { apiJson } from "@/lib/api";
 import { formatCurrency } from "@/lib/utils";
 
 export default async function ProductsPage({
@@ -18,19 +18,18 @@ export default async function ProductsPage({
   searchParams: Promise<{ q?: string }>;
 }) {
   const { q } = await searchParams;
-  const products = await prisma.product.findMany({
-    where: q
-      ? {
-          OR: [
-            { name: { contains: q, mode: "insensitive" } },
-            { brand: { contains: q, mode: "insensitive" } },
-            { colour: { contains: q, mode: "insensitive" } },
-          ],
-        }
-      : undefined,
-    include: { category: true },
-    orderBy: { name: "asc" },
-  });
+  const products = await apiJson<
+    Array<{
+      id: number;
+      name: string;
+      brand: string;
+      size: string;
+      colour: string;
+      price: string | number;
+      stockQty: number;
+      category: { name: string };
+    }>
+  >(`/products${q ? `?q=${encodeURIComponent(q)}` : ""}`);
 
   return (
     <>

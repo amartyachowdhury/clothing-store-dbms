@@ -4,7 +4,7 @@ import { PageHeader } from "@/components/page-header";
 import { Label, Input } from "@/components/ui/input";
 import { buttonVariants } from "@/components/ui/button";
 import { updateCustomer } from "@/app/actions/customers";
-import { prisma } from "@/lib/prisma";
+import { apiJson } from "@/lib/api";
 import { cn } from "@/lib/utils";
 
 export default async function EditCustomerPage({
@@ -13,9 +13,9 @@ export default async function EditCustomerPage({
   params: Promise<{ id: string }>;
 }) {
   const { id } = await params;
-  const customer = await prisma.customer.findUnique({
-    where: { id: Number(id) },
-  });
+  const customer = await apiJson<
+    { id: number; name: string; email: string | null; phone: string } | null
+  >(`/customers/${Number(id)}`);
 
   if (!customer) {
     notFound();

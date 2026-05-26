@@ -8,7 +8,7 @@ import {
 } from "@/components/ui/card";
 import { buttonVariants } from "@/components/ui/button";
 import { deleteProduct } from "@/app/actions/products";
-import { prisma } from "@/lib/prisma";
+import { apiJson } from "@/lib/api";
 import { cn, formatCurrency } from "@/lib/utils";
 
 export default async function ProductDetailPage({
@@ -17,10 +17,19 @@ export default async function ProductDetailPage({
   params: Promise<{ id: string }>;
 }) {
   const { id } = await params;
-  const product = await prisma.product.findUnique({
-    where: { id: Number(id) },
-    include: { category: true },
-  });
+  const product = await apiJson<
+    | {
+        id: number;
+        name: string;
+        brand: string;
+        size: string;
+        colour: string;
+        price: string | number;
+        stockQty: number;
+        category: { name: string };
+      }
+    | null
+  >(`/products/${Number(id)}`);
 
   if (!product) {
     notFound();

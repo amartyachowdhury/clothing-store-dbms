@@ -10,7 +10,7 @@ import {
 import { Badge } from "@/components/ui/badge";
 import { buttonVariants } from "@/components/ui/button";
 import { deletePayment } from "@/app/actions/orders";
-import { prisma } from "@/lib/prisma";
+import { apiJson } from "@/lib/api";
 import { cn, formatCurrency } from "@/lib/utils";
 
 export default async function PaymentDetailPage({
@@ -19,10 +19,17 @@ export default async function PaymentDetailPage({
   params: Promise<{ id: string }>;
 }) {
   const { id } = await params;
-  const payment = await prisma.payment.findUnique({
-    where: { id: Number(id) },
-    include: { order: { include: { customer: true } } },
-  });
+  const payment = await apiJson<
+    | {
+        id: number;
+        orderId: number;
+        method: string;
+        status: "PENDING" | "PAID";
+        amount: string | number;
+        order: { customer: { name: string } };
+      }
+    | null
+  >(`/payments/${Number(id)}`);
 
   if (!payment) {
     notFound();

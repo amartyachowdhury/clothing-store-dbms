@@ -1,6 +1,6 @@
 "use server";
 
-import { prisma } from "@/lib/prisma";
+import { apiJson } from "@/lib/api";
 import { productSchema } from "@/lib/validations";
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
@@ -20,9 +20,14 @@ export async function createProduct(formData: FormData) {
     throw new Error(parsed.error.issues[0]?.message ?? "Invalid product data");
   }
 
-  const product = await prisma.product.create({
-    data: parsed.data,
+  const product = await apiJson<{ id: number; error?: string }>("/products", {
+    method: "POST",
+    body: JSON.stringify(parsed.data),
   });
+
+  if ("error" in product && product.error) {
+    throw new Error(product.error);
+  }
 
   revalidatePath("/products");
   redirect(`/products/${product.id}`);
@@ -43,10 +48,13 @@ export async function updateProduct(id: number, formData: FormData) {
     throw new Error(parsed.error.issues[0]?.message ?? "Invalid product data");
   }
 
-  await prisma.product.update({
-    where: { id },
-    data: parsed.data,
+  const result = await apiJson<{ error?: string }>(`/products/${id}`, {
+    method: "PATCH",
+    body: JSON.stringify(parsed.data),
   });
+  if (result?.error) {
+    throw new Error(result.error);
+  }
 
   revalidatePath("/products");
   revalidatePath(`/products/${id}`);
@@ -54,7 +62,13 @@ export async function updateProduct(id: number, formData: FormData) {
 }
 
 export async function deleteProduct(id: number) {
-  await prisma.product.delete({ where: { id } });
+  const result = await apiJson<{ ok?: boolean; error?: string }>(
+    `/products/${id}`,
+    { method: "DELETE" },
+  );
+  if (result?.error) {
+    throw new Error(result.error);
+  }
   revalidatePath("/products");
   redirect("/products");
 }

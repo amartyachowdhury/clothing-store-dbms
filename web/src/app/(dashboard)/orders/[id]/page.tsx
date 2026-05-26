@@ -24,7 +24,7 @@ import {
   removeOrderItem,
 } from "@/app/actions/orders";
 import { getOrderWithDetails } from "@/lib/services/orders";
-import { prisma } from "@/lib/prisma";
+import { apiJson } from "@/lib/api";
 import { cn, formatCurrency, formatDate } from "@/lib/utils";
 
 export default async function OrderDetailPage({
@@ -37,7 +37,9 @@ export default async function OrderDetailPage({
 
   const [order, products] = await Promise.all([
     getOrderWithDetails(orderId),
-    prisma.product.findMany({ orderBy: { name: "asc" } }),
+    apiJson<Array<{ id: number; name: string; price: string | number }>>(
+      "/products",
+    ),
   ]);
 
   if (!order) {

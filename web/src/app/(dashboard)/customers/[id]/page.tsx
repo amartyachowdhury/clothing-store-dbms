@@ -9,7 +9,7 @@ import {
 } from "@/components/ui/card";
 import { buttonVariants } from "@/components/ui/button";
 import { deleteCustomer } from "@/app/actions/customers";
-import { prisma } from "@/lib/prisma";
+import { apiJson } from "@/lib/api";
 import { cn, formatCurrency, formatDate } from "@/lib/utils";
 
 export default async function CustomerDetailPage({
@@ -20,15 +20,13 @@ export default async function CustomerDetailPage({
   const { id } = await params;
   const customerId = Number(id);
 
-  const customer = await prisma.customer.findUnique({
-    where: { id: customerId },
-    include: {
-      orders: {
-        orderBy: { orderDate: "desc" },
-        take: 10,
-      },
-    },
-  });
+  const customer = await apiJson<{
+    id: number;
+    name: string;
+    email: string | null;
+    phone: string;
+    orders: Array<{ id: number; orderDate: string; totalAmount: string | number }>;
+  } | null>(`/customers/${customerId}`);
 
   if (!customer) {
     notFound();

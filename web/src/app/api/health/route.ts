@@ -1,10 +1,10 @@
 import { NextResponse } from "next/server";
-import { prisma } from "@/lib/prisma";
+import { apiJson } from "@/lib/api";
 
 export async function GET() {
   try {
-    await prisma.$queryRaw`SELECT 1`;
-    return NextResponse.json({ status: "ok", database: "connected" });
+    const result = await apiJson<{ status: string; database: string }>("/health");
+    return NextResponse.json(result);
   } catch {
     return NextResponse.json(
       { status: "error", database: "disconnected" },

@@ -9,14 +9,20 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { prisma } from "@/lib/prisma";
+import { apiJson } from "@/lib/api";
 import { formatCurrency } from "@/lib/utils";
 
 export default async function PaymentsPage() {
-  const payments = await prisma.payment.findMany({
-    include: { order: { include: { customer: true } } },
-    orderBy: { id: "desc" },
-  });
+  const payments = await apiJson<
+    Array<{
+      id: number;
+      orderId: number;
+      method: string;
+      status: "PENDING" | "PAID";
+      amount: string | number;
+      order: { customer: { name: string } };
+    }>
+  >("/payments");
 
   return (
     <>

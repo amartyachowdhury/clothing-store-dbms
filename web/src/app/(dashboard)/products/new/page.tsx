@@ -3,11 +3,13 @@ import { PageHeader } from "@/components/page-header";
 import { Label, Input, Select } from "@/components/ui/input";
 import { buttonVariants } from "@/components/ui/button";
 import { createProduct } from "@/app/actions/products";
-import { prisma } from "@/lib/prisma";
+import { apiJson } from "@/lib/api";
 import { cn } from "@/lib/utils";
 
 export default async function NewProductPage() {
-  const categories = await prisma.category.findMany({ orderBy: { name: "asc" } });
+  const categories = await apiJson<Array<{ id: number; name: string }>>(
+    "/categories",
+  );
 
   return (
     <>

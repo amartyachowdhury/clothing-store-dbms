@@ -3,7 +3,7 @@ import { PageHeader } from "@/components/page-header";
 import { Label, Input, Select } from "@/components/ui/input";
 import { buttonVariants } from "@/components/ui/button";
 import { createPayment } from "@/app/actions/orders";
-import { prisma } from "@/lib/prisma";
+import { apiJson } from "@/lib/api";
 import { cn } from "@/lib/utils";
 
 export default async function NewPaymentPage({
@@ -12,10 +12,9 @@ export default async function NewPaymentPage({
   searchParams: Promise<{ orderId?: string }>;
 }) {
   const { orderId } = await searchParams;
-  const orders = await prisma.order.findMany({
-    include: { customer: true },
-    orderBy: { id: "desc" },
-  });
+  const orders = await apiJson<
+    Array<{ id: number; totalAmount: string | number; customer: { name: string } }>
+  >("/orders");
 
   const selectedOrder = orderId
     ? orders.find((order) => order.id === Number(orderId))

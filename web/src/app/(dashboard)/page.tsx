@@ -7,38 +7,31 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { PageHeader } from "@/components/page-header";
-import { prisma } from "@/lib/prisma";
+import { apiJson } from "@/lib/api";
 import { formatCurrency } from "@/lib/utils";
 
 export default async function DashboardPage() {
-  const [customerCount, productCount, orderCount, paymentCount, orders, lowStock] =
-    await Promise.all([
-      prisma.customer.count(),
-      prisma.product.count(),
-      prisma.order.count(),
-      prisma.payment.count(),
-      prisma.order.findMany({
-        take: 5,
-        orderBy: { orderDate: "desc" },
-        include: { customer: true },
-      }),
-      prisma.product.findMany({
-        where: { stockQty: { lte: 10 } },
-        orderBy: { stockQty: "asc" },
-        take: 5,
-      }),
-    ]);
-
-  const revenue = await prisma.payment.aggregate({
-    where: { status: "PAID" },
-    _sum: { amount: true },
-  });
+  const [dashboardStats, orders, lowStock, revenue] = await Promise.all([
+    apiJson<{
+      customerCount: number;
+      productCount: number;
+      orderCount: number;
+      paymentCount: number;
+    }>("/dashboard/stats"),
+    apiJson<Array<{ id: number; totalAmount: string | number; status: string; customer: { name: string } }>>(
+      "/dashboard/recent-orders",
+    ),
+    apiJson<Array<{ id: number; name: string; stockQty: number }>>(
+      "/dashboard/low-stock",
+    ),
+    apiJson<{ total: number }>("/dashboard/revenue"),
+  ]);
 
   const stats = [
-    { label: "Customers", value: customerCount, href: "/customers" },
-    { label: "Products", value: productCount, href: "/products" },
-    { label: "Orders", value: orderCount, href: "/orders" },
-    { label: "Payments", value: paymentCount, href: "/payments" },
+    { label: "Customers", value: dashboardStats.customerCount, href: "/customers" },
+    { label: "Products", value: dashboardStats.productCount, href: "/products" },
+    { label: "Orders", value: dashboardStats.orderCount, href: "/orders" },
+    { label: "Payments", value: dashboardStats.paymentCount, href: "/payments" },
   ];
 
   return (
@@ -69,7 +62,7 @@ export default async function DashboardPage() {
           </CardHeader>
           <CardContent>
             <p className="text-3xl font-semibold">
-              {formatCurrency(Number(revenue._sum.amount ?? 0))}
+              {formatCurrency(Number(revenue.total ?? 0))}
             </p>
           </CardContent>
         </Card>

@@ -4,7 +4,7 @@ import { PageHeader } from "@/components/page-header";
 import { Label, Input, Select } from "@/components/ui/input";
 import { buttonVariants } from "@/components/ui/button";
 import { updatePayment } from "@/app/actions/orders";
-import { prisma } from "@/lib/prisma";
+import { apiJson } from "@/lib/api";
 import { cn } from "@/lib/utils";
 
 export default async function EditPaymentPage({
@@ -14,8 +14,17 @@ export default async function EditPaymentPage({
 }) {
   const { id } = await params;
   const [payment, orders] = await Promise.all([
-    prisma.payment.findUnique({ where: { id: Number(id) } }),
-    prisma.order.findMany({ include: { customer: true }, orderBy: { id: "desc" } }),
+    apiJson<
+      | {
+          id: number;
+          orderId: number;
+          method: string;
+          status: "PENDING" | "PAID";
+          amount: string | number;
+        }
+      | null
+    >(`/payments/${Number(id)}`),
+    apiJson<Array<{ id: number; customer: { name: string } }>>("/orders"),
   ]);
 
   if (!payment) {

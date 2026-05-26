@@ -21,21 +21,28 @@ npm run dev
 
 Open `http://localhost:3000`.
 
-## Docker (separate startup)
+## Docker (strict 3-container setup)
 
-You can start the DB, app, and DB tasks as separate Docker services:
+Services: **`db`** (Postgres), **`backend`** (NestJS API), **`web`** (Next.js frontend).
 
 ```bash
-# 1) Start only Postgres
+# 1) Database only
 docker compose up -d db
 
-# 2) Run migrations + seed (one-off containers)
+# 2) Migrations + seed (one-off)
 docker compose --profile tools run --rm migrate
 docker compose --profile tools run --rm seed
 
-# 3) Start the app (Next.js)
+# 3) API only
+docker compose up -d backend
+
+# 4) Frontend only (talks to backend over HTTP)
 docker compose up -d web
 ```
+
+- Frontend: `http://localhost:3000`
+- Backend API: `http://localhost:4000/health`
+- Postgres: `localhost:5433`
 
 ## Database
 

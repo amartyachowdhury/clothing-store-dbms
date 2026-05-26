@@ -12,42 +12,52 @@ services:
     volumes:
       - clothing_store_data:/var/lib/postgresql/data
 
-  # Next.js (App Router) app — contains both "frontend" and "backend" in Option A.
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: clothing-store-backend
+    depends_on:
+      - db
+    environment:
+      NODE_ENV: development
+      DATABASE_URL: postgresql://postgres:postgres@db:5432/clothing_store?schema=public
+      PORT: 4000
+    ports:
+      - "4000:4000"
+
   web:
     build:
       context: ./web
       dockerfile: Dockerfile
-    container_name: clothing-store-web
+    container_name: clothing-store-frontend
     depends_on:
-      - db
+      - backend
     environment:
       NODE_ENV: development
-      DATABASE_URL: postgresql://postgres:postgres@db:5432/clothing_store?schema=public
+      API_URL: http://backend:4000
+      NEXT_PUBLIC_API_URL: http://backend:4000
     ports:
       - "3000:3000"
 
-  # Run DB migrations on demand (one-off container).
   migrate:
     build:
-      context: ./web
+      context: ./backend
       dockerfile: Dockerfile
     depends_on:
       - db
     environment:
-      NODE_ENV: development
       DATABASE_URL: postgresql://postgres:postgres@db:5432/clothing_store?schema=public
     command: ["npm", "run", "db:migrate"]
     profiles: ["tools"]
 
-  # Seed DB on demand (one-off container).
   seed:
     build:
-      context: ./web
+      context: ./backend
       dockerfile: Dockerfile
     depends_on:
       - db
     environment:
-      NODE_ENV: development
       DATABASE_URL: postgresql://postgres:postgres@db:5432/clothing_store?schema=public
     command: ["npm", "run", "db:seed"]
     profiles: ["tools"]

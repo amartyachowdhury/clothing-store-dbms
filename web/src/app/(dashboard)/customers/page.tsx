@@ -8,7 +8,7 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { prisma } from "@/lib/prisma";
+import { apiJson } from "@/lib/api";
 
 export default async function CustomersPage({
   searchParams,
@@ -16,18 +16,9 @@ export default async function CustomersPage({
   searchParams: Promise<{ q?: string }>;
 }) {
   const { q } = await searchParams;
-  const customers = await prisma.customer.findMany({
-    where: q
-      ? {
-          OR: [
-            { name: { contains: q, mode: "insensitive" } },
-            { email: { contains: q, mode: "insensitive" } },
-            { phone: { contains: q, mode: "insensitive" } },
-          ],
-        }
-      : undefined,
-    orderBy: { name: "asc" },
-  });
+  const customers = await apiJson<
+    Array<{ id: number; name: string; email: string | null; phone: string }>
+  >(`/customers${q ? `?q=${encodeURIComponent(q)}` : ""}`);
 
   return (
     <>

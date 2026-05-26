@@ -3,13 +3,13 @@ import { PageHeader } from "@/components/page-header";
 import { Label, Input, Select } from "@/components/ui/input";
 import { buttonVariants } from "@/components/ui/button";
 import { createOrder } from "@/app/actions/orders";
-import { prisma } from "@/lib/prisma";
+import { apiJson } from "@/lib/api";
 import { cn } from "@/lib/utils";
 
 export default async function NewOrderPage() {
   const [customers, employees] = await Promise.all([
-    prisma.customer.findMany({ orderBy: { name: "asc" } }),
-    prisma.employee.findMany({ orderBy: { name: "asc" } }),
+    apiJson<Array<{ id: number; name: string }>>("/customers"),
+    apiJson<Array<{ id: number; name: string; role: string }>>("/employees"),
   ]);
 
   return (

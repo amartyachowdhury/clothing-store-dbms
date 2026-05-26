@@ -4,7 +4,7 @@ import { PageHeader } from "@/components/page-header";
 import { Label, Input, Select } from "@/components/ui/input";
 import { buttonVariants } from "@/components/ui/button";
 import { updateProduct } from "@/app/actions/products";
-import { prisma } from "@/lib/prisma";
+import { apiJson } from "@/lib/api";
 import { cn } from "@/lib/utils";
 
 export default async function EditProductPage({
@@ -14,8 +14,20 @@ export default async function EditProductPage({
 }) {
   const { id } = await params;
   const [product, categories] = await Promise.all([
-    prisma.product.findUnique({ where: { id: Number(id) } }),
-    prisma.category.findMany({ orderBy: { name: "asc" } }),
+    apiJson<
+      | {
+          id: number;
+          name: string;
+          brand: string;
+          size: string;
+          colour: string;
+          price: string | number;
+          stockQty: number;
+          categoryId: number;
+        }
+      | null
+    >(`/products/${Number(id)}`),
+    apiJson<Array<{ id: number; name: string }>>("/categories"),
   ]);
 
   if (!product) {

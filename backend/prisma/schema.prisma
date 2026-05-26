@@ -1,0 +1,107 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+enum OrderStatus {
+  PENDING
+  COMPLETED
+  CANCELLED
+}
+
+enum PaymentStatus {
+  PENDING
+  PAID
+}
+
+enum PaymentMethod {
+  CASH
+  DEBIT
+  CREDIT
+}
+
+model Category {
+  id        Int       @id @default(autoincrement())
+  name      String    @unique @db.VarChar(64)
+  products  Product[]
+
+  @@map("categories")
+}
+
+model Customer {
+  id     Int     @id @default(autoincrement())
+  name   String  @db.VarChar(128)
+  email  String? @db.VarChar(128)
+  phone  String  @db.VarChar(64)
+  orders Order[]
+
+  @@map("customers")
+}
+
+model Employee {
+  id     Int     @id @default(autoincrement())
+  name   String  @db.VarChar(128)
+  email  String  @db.VarChar(128)
+  phone  String  @db.VarChar(64)
+  role   String  @db.VarChar(64)
+  orders Order[]
+
+  @@map("employees")
+}
+
+model Product {
+  id         Int         @id @default(autoincrement())
+  name       String      @db.VarChar(128)
+  size       String      @db.VarChar(64)
+  colour     String      @db.VarChar(64)
+  brand      String      @db.VarChar(128)
+  price      Decimal     @db.Decimal(10, 2)
+  stockQty   Int         @map("stock_qty")
+  categoryId Int         @map("category_id")
+  category   Category    @relation(fields: [categoryId], references: [id])
+  orderItems OrderItem[]
+
+  @@map("products")
+}
+
+model Order {
+  id          Int         @id @default(autoincrement())
+  orderDate   DateTime    @default(now()) @map("order_date") @db.Date
+  totalAmount Decimal     @default(0) @map("total_amount") @db.Decimal(12, 2)
+  status      OrderStatus @default(PENDING)
+  customerId  Int         @map("customer_id")
+  employeeId  Int         @map("employee_id")
+  customer    Customer    @relation(fields: [customerId], references: [id])
+  employee    Employee    @relation(fields: [employeeId], references: [id])
+  items       OrderItem[]
+  payments    Payment[]
+
+  @@map("orders")
+}
+
+model OrderItem {
+  orderId   Int     @map("order_id")
+  productId Int     @map("product_id")
+  quantity  Int     @map("item_qty")
+  unitPrice Decimal @map("unit_price") @db.Decimal(10, 2)
+  order     Order   @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  product   Product @relation(fields: [productId], references: [id])
+
+  @@id([orderId, productId])
+  @@map("order_items")
+}
+
+model Payment {
+  id      Int           @id @default(autoincrement())
+  orderId Int           @map("order_id")
+  method  PaymentMethod
+  amount  Decimal       @db.Decimal(12, 2)
+  status  PaymentStatus @default(PENDING)
+  order   Order         @relation(fields: [orderId], references: [id], onDelete: Cascade)
+
+  @@map("payments")
+}
+

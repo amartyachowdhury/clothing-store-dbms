@@ -9,7 +9,7 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { prisma } from "@/lib/prisma";
+import { apiJson } from "@/lib/api";
 import { formatCurrency, formatDate } from "@/lib/utils";
 
 export default async function OrdersPage({
@@ -18,19 +18,16 @@ export default async function OrdersPage({
   searchParams: Promise<{ q?: string }>;
 }) {
   const { q } = await searchParams;
-  const orders = await prisma.order.findMany({
-    where: q
-      ? {
-          OR: [
-            { status: { equals: q.toUpperCase() as "PENDING" | "COMPLETED" | "CANCELLED" } },
-            { customer: { name: { contains: q, mode: "insensitive" } } },
-            { employee: { name: { contains: q, mode: "insensitive" } } },
-          ],
-        }
-      : undefined,
-    include: { customer: true, employee: true },
-    orderBy: { orderDate: "desc" },
-  });
+  const orders = await apiJson<
+    Array<{
+      id: number;
+      orderDate: string;
+      totalAmount: string | number;
+      status: "PENDING" | "COMPLETED" | "CANCELLED";
+      customer: { name: string };
+      employee: { name: string };
+    }>
+  >(`/orders${q ? `?q=${encodeURIComponent(q)}` : ""}`);
 
   return (
     <>
