@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title th:text="${payment.paymentId != null} ? 'Edit Payment' : 'New Payment'">Payment Form - CPS510 DBMS</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="/css/style.css" rel="stylesheet">
+</head>
+<body>
+    <nav class="navbar navbar-expand-lg navbar-dark bg-primary">
+        <div class="container-fluid">
+            <a class="navbar-brand" th:href="@{/}">CPS510 DBMS</a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav">
+                    <li class="nav-item">
+                        <a class="nav-link" th:href="@{/}">Home</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" th:href="@{/customers}">Customers</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" th:href="@{/products}">Products</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" th:href="@{/orders}">Orders</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link active" th:href="@{/payments}">Payments</a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container mt-4">
+        <h1 th:text="${payment.paymentId != null} ? 'Edit Payment' : 'New Payment'">Payment Form</h1>
+
+        <div th:if="${errorMessage}" class="alert alert-danger alert-dismissible fade show" role="alert">
+            <span th:text="${errorMessage}"></span>
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+
+        <div class="card">
+            <div class="card-body">
+                <form th:action="${payment.paymentId != null} ? @{/payments/{id}/edit(id=${payment.paymentId})} : @{/payments/new}" 
+                      th:object="${payment}" method="post">
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label for="orderId" class="form-label">Order ID *</label>
+                            <select class="form-select" id="orderId" th:field="*{orderId}" required>
+                                <option value="">Select Order</option>
+                                <option th:each="order : ${orders}" 
+                                        th:value="${order.orderId}" 
+                                        th:text="'Order #' + ${order.orderId} + ' - $' + ${#numbers.formatDecimal(order.totalAmount, 0, 'COMMA', 2, 'POINT')}"></option>
+                            </select>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label for="paymentMethod" class="form-label">Payment Method *</label>
+                            <select class="form-select" id="paymentMethod" th:field="*{paymentMethod}" required>
+                                <option value="">Select Method</option>
+                                <option value="Cash">Cash</option>
+                                <option value="Debit">Debit</option>
+                                <option value="Credit">Credit</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label for="paymentAmount" class="form-label">Amount *</label>
+                            <input type="number" step="0.01" min="0.01" class="form-control" id="paymentAmount" th:field="*{paymentAmount}" required>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label for="paymentStatus" class="form-label">Status *</label>
+                            <select class="form-select" id="paymentStatus" th:field="*{paymentStatus}" required>
+                                <option value="Pending">Pending</option>
+                                <option value="Paid">Paid</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="d-flex gap-2">
+                        <button type="submit" class="btn btn-primary">Save</button>
+                        <a th:href="@{/payments}" class="btn btn-secondary">Cancel</a>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>
+

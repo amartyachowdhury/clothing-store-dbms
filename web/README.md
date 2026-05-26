@@ -37,6 +37,13 @@ npm run db:push
 npm run db:seed
 ```
 
+> For a production-style workflow, prefer migrations:
+>
+> ```bash
+> npm run db:migrate
+> npm run db:seed
+> ```
+
 ### 4. Run the app
 
 ```bash

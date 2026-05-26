@@ -54,41 +54,45 @@ export async function addOrderItem(orderId: number, formData: FormData) {
     throw new Error(parsed.error.issues[0]?.message ?? "Invalid line item");
   }
 
-  await prisma.orderItem.upsert({
-    where: {
-      orderId_productId: {
+  await prisma.$transaction(async (tx) => {
+    await tx.orderItem.upsert({
+      where: {
+        orderId_productId: {
+          orderId,
+          productId: parsed.data.productId,
+        },
+      },
+      update: {
+        quantity: parsed.data.quantity,
+        unitPrice: parsed.data.unitPrice,
+      },
+      create: {
         orderId,
         productId: parsed.data.productId,
+        quantity: parsed.data.quantity,
+        unitPrice: parsed.data.unitPrice,
       },
-    },
-    update: {
-      quantity: parsed.data.quantity,
-      unitPrice: parsed.data.unitPrice,
-    },
-    create: {
-      orderId,
-      productId: parsed.data.productId,
-      quantity: parsed.data.quantity,
-      unitPrice: parsed.data.unitPrice,
-    },
-  });
+    });
 
-  await recalculateOrderTotal(orderId);
-  await syncOrderStatusFromPayments(orderId);
+    await recalculateOrderTotal(orderId, tx);
+    await syncOrderStatusFromPayments(orderId, tx);
+  });
 
   revalidatePath(`/orders/${orderId}`);
   revalidatePath("/orders");
 }
 
 export async function removeOrderItem(orderId: number, productId: number) {
-  await prisma.orderItem.delete({
-    where: {
-      orderId_productId: { orderId, productId },
-    },
-  });
+  await prisma.$transaction(async (tx) => {
+    await tx.orderItem.delete({
+      where: {
+        orderId_productId: { orderId, productId },
+      },
+    });
 
-  await recalculateOrderTotal(orderId);
-  await syncOrderStatusFromPayments(orderId);
+    await recalculateOrderTotal(orderId, tx);
+    await syncOrderStatusFromPayments(orderId, tx);
+  });
 
   revalidatePath(`/orders/${orderId}`);
   revalidatePath("/orders");
@@ -106,11 +110,13 @@ export async function createPayment(formData: FormData) {
     throw new Error(parsed.error.issues[0]?.message ?? "Invalid payment data");
   }
 
-  const payment = await prisma.payment.create({
-    data: parsed.data,
+  const payment = await prisma.$transaction(async (tx) => {
+    const created = await tx.payment.create({
+      data: parsed.data,
+    });
+    await syncOrderStatusFromPayments(parsed.data.orderId, tx);
+    return created;
   });
-
-  await syncOrderStatusFromPayments(parsed.data.orderId);
 
   revalidatePath("/payments");
   revalidatePath(`/orders/${parsed.data.orderId}`);
@@ -129,12 +135,14 @@ export async function updatePayment(id: number, formData: FormData) {
     throw new Error(parsed.error.issues[0]?.message ?? "Invalid payment data");
   }
 
-  const payment = await prisma.payment.update({
-    where: { id },
-    data: parsed.data,
+  const payment = await prisma.$transaction(async (tx) => {
+    const updated = await tx.payment.update({
+      where: { id },
+      data: parsed.data,
+    });
+    await syncOrderStatusFromPayments(parsed.data.orderId, tx);
+    return updated;
   });
-
-  await syncOrderStatusFromPayments(parsed.data.orderId);
 
   revalidatePath("/payments");
   revalidatePath(`/payments/${id}`);
@@ -143,8 +151,11 @@ export async function updatePayment(id: number, formData: FormData) {
 }
 
 export async function deletePayment(id: number) {
-  const payment = await prisma.payment.delete({ where: { id } });
-  await syncOrderStatusFromPayments(payment.orderId);
+  const payment = await prisma.$transaction(async (tx) => {
+    const deleted = await tx.payment.delete({ where: { id } });
+    await syncOrderStatusFromPayments(deleted.orderId, tx);
+    return deleted;
+  });
 
   revalidatePath("/payments");
   revalidatePath(`/orders/${payment.orderId}`);
