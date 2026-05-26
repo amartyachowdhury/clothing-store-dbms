@@ -37,3 +37,5 @@ npm install
 ## Dependabot
 
 [`.github/dependabot.yml`](../.github/dependabot.yml) opens weekly npm PRs for `web/` and `backend/`, plus monthly GitHub Actions updates. Review lockfile changes in those PRs with `npm run verify:lockfiles`.
+
+**Ignored major bumps** (until the stack supports them): `eslint` / `@eslint/js` (ESLint 10), `vitest` 4 in `backend/`, `eslint` 10 in `web/`. You can close failing Dependabot PRs for those; they will not be re-opened after the ignore rules land on `main`.

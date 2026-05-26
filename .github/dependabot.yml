@@ -26,6 +26,13 @@ updates:
       # Vitest 4 pulls rolldown native bindings; stay on Vitest 3 for portable CI/dev
       - dependency-name: "vitest"
         update-types: ["version-update:semver-major"]
+      # typescript-eslint + @eslint/js 10 require ESLint 10; lockfile/CI break until upgraded together
+      - dependency-name: "eslint"
+        update-types: ["version-update:semver-major"]
+      - dependency-name: "@eslint/js"
+        update-types: ["version-update:semver-major"]
+      - dependency-name: "typescript-eslint"
+        update-types: ["version-update:semver-major"]
     groups:
       nest:
         patterns:
